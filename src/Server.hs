@@ -23,10 +23,13 @@ type API = RootAPI :<|> ResourcesApi
 page :: Html ()
 page = html_ do
   head_ do
+    meta_ [charset_ "UTF-8"]
+    meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0"]
+    link_ [rel_ "stylesheet", type_ "text/css", href_ "tw.css"]
     title_ "Introduction page."
-    link_ [rel_ "stylesheet", type_ "text/css", href_ "screen.css"]
   body_ do
     div_ [id_ "header"] "Syntax"
+    h1_ [class_ "text-3xl font-bold underline"] "Hello world!"
     p_ "This is an example of Lucid syntax."
     ul_ $ mapM_ (li_ . toHtml . show @Int) [1,2,3]
 
