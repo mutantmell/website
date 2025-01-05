@@ -29,13 +29,13 @@ $(createApiAndServerDecs "ResourcesApi" "resourcesApi" "static")
 
 type API = RootAPI :<|> TwAPI :<|> PostAPI :<|> ResourcesApi
 
-wrap :: Monad m => HtmlT m () -> HtmlT m () -> HtmlT m ()
+wrap :: Monad m => Text -> HtmlT m () -> HtmlT m ()
 wrap title body = doctype_ *> html_ do
   head_ do
     meta_ [charset_ "UTF-8"]
     meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0"]
     link_ [rel_ "stylesheet", type_ "text/css", href_ "/css/tw.css"]
-    title_ title
+    title_ (toHtml title)
   body_ body
 
 tailwindcss_ex :: Html ()
@@ -59,8 +59,10 @@ post p = do
   -- todo: proper escaping, sanitizing, etc for the file path
   file <- liftIO $ Data.Text.IO.readFile ("./data/" <> (Data.Text.unpack p) <> ".md")
   let postHtml = CMark.commonmarkToHtml [CMark.optSafe] file
-  pure $ wrap "p" do
-    toHtmlRaw postHtml
+  pure $ wrap p do
+    div_ [class_ "flex justify-center items-center"] do
+      article_ [class_ "mx-auto prose lg:prose-xl"] do
+        toHtmlRaw postHtml
 
 handler :: Server API
 handler = pure page :<|> pure tailwindcss_ex :<|> post :<|> resourcesApi
