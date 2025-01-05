@@ -21,11 +21,16 @@ library
     -- other-modules:
     -- other-extensions:
     build-depends:    base ^>=4.20.0.0
-                    , servant
+                    , text
+                    -- html
                     , lucid
+                    -- web
+                    , servant
                     , servant-lucid
                     , servant-server
                     , servant-static-th
+                    -- markdown
+                    , cmark
     hs-source-dirs:   src
     default-language: GHC2024
 
