@@ -10,7 +10,7 @@ module Server where
 import Lucid
 import Servant ( Server )
 import Servant.API ( Get, type (:<|>)(..), (:>), Capture )
-import qualified Servant.HTML.Lucid
+import qualified Servant.API.ContentTypes.Lucid
 import Servant.Static.TH ( createApiAndServerDecs )
 import Data.Text ( Text )
 import qualified Data.Text
@@ -18,12 +18,14 @@ import qualified Data.Text.IO
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified CMark
 
+type SvHtml = Servant.API.ContentTypes.Lucid.HTML
+
 type RootAPI
-  = Get '[Servant.HTML.Lucid.HTML] (Html ())
+  = Get '[SvHtml] (Html ())
 type TwAPI
-  = "tw" :> Get '[Servant.HTML.Lucid.HTML] (Html ())
+  = "tw" :> Get '[SvHtml] (Html ())
 type PostAPI
-  = "post" :> Capture "post" Text :> Get '[Servant.HTML.Lucid.HTML] (Html ())
+  = "post" :> Capture "post" Text :> Get '[SvHtml] (Html ())
 
 $(createApiAndServerDecs "ResourcesApi" "resourcesApi" "static")
 
