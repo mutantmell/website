@@ -8,6 +8,7 @@
 module Server where
 
 import Lucid
+import Lucid.Base (commuteHtmlT2)
 import Servant ( Server )
 import Servant.API ( Get, type (:<|>)(..), (:>), Capture )
 import qualified Servant.API.ContentTypes.Lucid
@@ -25,7 +26,7 @@ type RootAPI
 type TwAPI
   = "tw" :> Get '[SvHtml] (Html ())
 type PostAPI
-  = "post" :> Capture "post" Text :> Get '[SvHtml] (Html ())
+  = "blog" :> Capture "blog" Text :> Get '[SvHtml] (Html ())
 
 $(createApiAndServerDecs "ResourcesApi" "resourcesApi" "static")
 
@@ -56,15 +57,15 @@ page = wrap "Introduction page." do
   p_ "This is an example of Lucid syntax."
   ul_ $ mapM_ (li_ . toHtml . show @Int) [1,2,3]
 
-post :: forall m . (MonadIO m) => Text -> m (Html ())
-post p = do
+blogPost :: (MonadIO m) => Text -> HtmlT m ()
+blogPost p = do
   -- todo: proper escaping, sanitizing, etc for the file path
   file <- liftIO $ Data.Text.IO.readFile ("./data/" <> (Data.Text.unpack p) <> ".md")
   let postHtml = CMark.commonmarkToHtml [CMark.optSafe] file
-  pure $ wrap p do
+  wrap p do
     div_ [class_ "flex justify-center items-center"] do
       article_ [class_ "mx-auto prose lg:prose-xl"] do
         toHtmlRaw postHtml
 
 handler :: Server API
-handler = pure page :<|> pure tailwindcss_ex :<|> post :<|> resourcesApi
+handler = pure page :<|> pure tailwindcss_ex :<|> commuteHtmlT2 . blogPost :<|> resourcesApi
