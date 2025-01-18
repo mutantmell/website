@@ -29,7 +29,7 @@ library
                     , servant
                     , dani-servant-lucid2
                     , servant-server
-                    , servant-static-th
+                    -- , servant-static-th
                     -- markdown
                     , cmark
     hs-source-dirs:   src

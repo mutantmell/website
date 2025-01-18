@@ -9,37 +9,41 @@ module Server where
 
 import Lucid
 import Lucid.Base (commuteHtmlT2)
-import Servant ( Server )
+import Servant ( Server, Raw )
 import Servant.API ( Get, type (:<|>)(..), (:>), Capture )
 import qualified Servant.API.ContentTypes.Lucid
-import Servant.Static.TH ( createApiAndServerDecs )
 import Data.Text ( Text )
 import qualified Data.Text
 import qualified Data.Text.IO
 import Control.Monad.IO.Class (MonadIO(..))
 import qualified CMark
+import Servant.Server.StaticFiles (serveDirectoryWebApp)
 
 type SvHtml = Servant.API.ContentTypes.Lucid.HTML
+type GetHtml = Get '[SvHtml] (Html ())
 
-type RootAPI
-  = Get '[SvHtml] (Html ())
-type TwAPI
-  = "tw" :> Get '[SvHtml] (Html ())
-type PostAPI
-  = "blog" :> Capture "blog" Text :> Get '[SvHtml] (Html ())
+type RootApi = GetHtml
+type AboutApi = "about" :> GetHtml
+type BlogApi = "blog" :> GetHtml
+type BlogPostApi = "blog" :> Capture "post" Text :> GetHtml
 
-$(createApiAndServerDecs "ResourcesApi" "resourcesApi" "static")
+-- $(createApiAndServerDecs "ResourcesApi" "resourcesApi" "static")
 
-type API = RootAPI :<|> TwAPI :<|> PostAPI :<|> ResourcesApi
+type API = RootApi
+      :<|> AboutApi
+      :<|> BlogApi
+      :<|> BlogPostApi
+      :<|> "static" :> Raw
 
 wrap :: Monad m => Text -> HtmlT m () -> HtmlT m ()
 wrap title body = doctype_ *> html_ do
   head_ do
     meta_ [charset_ "UTF-8"]
     meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0"]
-    link_ [rel_ "stylesheet", type_ "text/css", href_ "/css/tw.css"]
+    link_ [rel_ "stylesheet", type_ "text/css", href_ "/static/css/tw.css"]
     title_ (toHtml title)
-  body_ body
+  -- TODO: better bg color?
+  body_ [class_ "bg-indigo-800"] body
 
 tailwindcss_ex :: Html ()
 tailwindcss_ex = wrap "Tailwind Test." do
@@ -50,12 +54,25 @@ tailwindcss_ex = wrap "Tailwind Test." do
       div_ [class_ "text-xl font-medium text-black"] "ChitChat"
       p_ [class_ "text-slate-500"] "You have a new message!"
 
-page :: Html ()
-page = wrap "Introduction page." do
-  div_ [id_ "header"] "Syntax"
-  h1_ [class_ "text-3xl font-bold underline"] "Hello world!"
-  p_ "This is an example of Lucid syntax."
-  ul_ $ mapM_ (li_ . toHtml . show @Int) [1,2,3]
+rootPage :: Html ()
+rootPage = wrap "Introduction page" do
+  header_ [class_ "bg-amber-300"] do
+    div_ [class_ "p-6 max-w-sm flex flex-row gap-x-4 justify-center text-xl mx-16"] do
+      h1_ [class_ "text-yellow-950"] "mutantmell.net"
+      a_ [href_ "/about", class_ "text-blue-600"] "About"
+      a_ [href_ "/blog", class_ "text-blue-600"] "Blog"
+  -- TODO: add some spacing or something
+  div_ [class_ "p-8 mx-16 bg-white gap-x-4"] do
+    div_ [class_ "p-6 max-w-sm mx-auto  flex items-center gap-x-4"] do
+      div_ [class_ "text-2xl"] "This is my web page"
+
+about :: Html ()
+about = wrap "About" do
+  div_ "About Me"
+
+blog :: Html ()
+blog = wrap "Blog Archive" do
+  div_ "All the blogs (with some htmx?)"
 
 blogPost :: (MonadIO m) => Text -> HtmlT m ()
 blogPost p = do
@@ -68,4 +85,8 @@ blogPost p = do
         toHtmlRaw postHtml
 
 handler :: Server API
-handler = pure page :<|> pure tailwindcss_ex :<|> commuteHtmlT2 . blogPost :<|> resourcesApi
+handler = pure rootPage
+        :<|> pure about
+        :<|> pure blog
+        :<|> commuteHtmlT2 . blogPost
+        :<|> serveDirectoryWebApp "static"
