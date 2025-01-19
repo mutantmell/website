@@ -56,15 +56,15 @@ tailwindcss_ex = wrap "Tailwind Test." do
 
 rootPage :: Html ()
 rootPage = wrap "Introduction page" do
-  header_ [class_ "bg-amber-300"] do
-    div_ [class_ "p-6 max-w-sm flex flex-row gap-x-4 justify-center text-xl mx-16"] do
-      h1_ [class_ "text-yellow-950"] "mutantmell.net"
+  header_ [class_ "bg-amber-300 border-b-2 border-black"] do
+    div_ [class_ "py-6 mx-12 max-w-sm flex flex-row gap-x-4 justify-left text-xl"] do
+      a_ [href_ "/", class_ "text-blue-600"] "mutantmell.net" -- "text-yellow-950"
       a_ [href_ "/about", class_ "text-blue-600"] "About"
       a_ [href_ "/blog", class_ "text-blue-600"] "Blog"
-  -- TODO: add some spacing or something
-  div_ [class_ "p-8 mx-16 bg-white gap-x-4"] do
-    div_ [class_ "p-6 max-w-sm mx-auto  flex items-center gap-x-4"] do
-      div_ [class_ "text-2xl"] "This is my web page"
+  div_ [class_ "p-8 my-12 mx-10 border-2 border-black bg-amber-300 gap-x-4"] do
+    h1_ [class_ "text-yellow-950 text-2xl flex justify-left"] "mutantmell's spot on the internet"
+    div_ [class_ "p-6 max-w-sm mx-auto flex items-center gap-x-4"] do
+      p_ [] "This is my web page"
 
 about :: Html ()
 about = wrap "About" do
