@@ -56,12 +56,13 @@ tailwindcss_ex = wrap "Tailwind Test." do
 rootPage :: Html ()
 rootPage = wrap "Introduction page" do
   header_ [class_ "bg-soft-blue border-b-2 border-black"] do
-    nav_ [class_ "py-6 mx-12 max-w-sm flex flex-row gap-x-4 justify-left"] do
-      a_ [href_ "/", class_ "text-2xl"] "mutantmell.net" -- "text-yellow-950"
-      a_ [href_ "/about", class_ "text-brass text-xl pt-1"] "About"
-      a_ [href_ "/blog", class_ "text-brass text-xl pt-1"] "Blog"
-  div_ [class_ "my-12 mx-12 mx-auto max-w-prose"] do
-    h1_ [class_ "text-2xl justify-left border-b border-black"] "mutantmell's spot on the internet"
+    h1_ [class_ "text-2xl justify-left border-b border-black"] "mutantmell dot net"
+  nav_ [class_ "py-6 mx-12 max-w-sm flex flex-row gap-x-4 justify-left"] do
+    a_ [href_ "/", class_ "text-2xl"] "mutantmell.net" -- "text-yellow-950"
+    a_ [href_ "/about", class_ "text-brass text-xl pt-1"] "About"
+    a_ [href_ "/blog", class_ "text-brass text-xl pt-1"] "Blog"
+  main_ [class_ "my-12 mx-12 mx-auto max-w-prose"] do
+    
     div_ [class_ "mx-auto gap-x-4"] do
       p_ [] $ toHtml $ Data.Text.unwords
         [ "Lorem ipsum odor amet, consectetuer adipiscing elit."
