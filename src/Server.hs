@@ -36,7 +36,7 @@ type API = RootApi
       :<|> "static" :> Raw
 
 wrap :: Monad m => Text -> HtmlT m () -> HtmlT m ()
-wrap title body = doctype_ *> html_ do
+wrap title body = doctype_ *> html_ [lang_ "en-US"] do
   head_ do
     meta_ [charset_ "UTF-8"]
     meta_ [name_ "viewport", content_ "width=device-width, initial-scale=1.0"]
